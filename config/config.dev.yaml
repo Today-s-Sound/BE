@@ -7,9 +7,9 @@ app:
 db:
   host: "localhost"
   port: 5432
-  user: "dev_user"
-  password: "dev_password"
-  dbname: "dev_db"
+  user: "postgres"
+  password: "postgresadmin"
+  dbname: "sound_postgres"
   sslmode: "disable"
 
 secure:

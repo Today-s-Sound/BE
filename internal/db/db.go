@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -32,22 +33,25 @@ func NewDBConnection(cfg *config.Config) (*sql.DB, error) {
 
 	// 실제 연결을 테스트하여 연결 가능 여부 확인
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf(
-			"failed to ping database (host: %s, db: %s): %w",
-			cfg.DB.Host, cfg.DB.DBName, err,
-		)
+		// 임시로 데이터베이스 연결 실패 시에도 nil을 반환하여 애플리케이션이 시작되도록 함
+		log.Printf("WARNING: Database connection failed (host: %s, db: %s): %v", cfg.DB.Host, cfg.DB.DBName, err)
+		log.Printf("WARNING: Application will start without database connection")
+		return db, nil // 연결 실패에도 db 객체 반환
 	}
 
-	if err := createUserTable(db); err != nil {
-		return nil, fmt.Errorf("failed to create users table: %w", err)
-	}
+	// 데이터베이스 연결이 성공한 경우에만 테이블 생성 시도
+	if err := db.Ping(); err == nil {
+		if err := createUserTable(db); err != nil {
+			return nil, fmt.Errorf("failed to create users table: %w", err)
+		}
 
-	if err := createProductTable(db); err != nil {
-		return nil, fmt.Errorf("failed to create products table: %w", err)
-	}
+		if err := createProductTable(db); err != nil {
+			return nil, fmt.Errorf("failed to create products table: %w", err)
+		}
 
-	if err := createOrderTable(db); err != nil {
-		return nil, fmt.Errorf("failed to create orders table: %w", err)
+		if err := createOrderTable(db); err != nil {
+			return nil, fmt.Errorf("failed to create orders table: %w", err)
+		}
 	}
 
 	return db, nil

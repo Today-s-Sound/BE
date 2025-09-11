@@ -82,7 +82,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	if err := c.Validate(req); err != nil {
 		return c.JSON(http.StatusBadRequest, ErrResponse(domain.ErrInvalidInput))
 	}
-
+	
 	ctx := c.Request().Context()
 	loginResponse, err := h.authUseCase.Login(ctx, req.Email, req.Password)
 	if err == nil {
