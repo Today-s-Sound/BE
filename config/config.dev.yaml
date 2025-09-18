@@ -6,10 +6,10 @@ app:
 
 db:
   host: "localhost"
-  port: 5432
-  user: "postgres"
-  password: "postgresadmin"
-  dbname: "sound_postgres"
+  port: 3305
+  user: "root"
+  password: "root"
+  dbname: "main_db"
   sslmode: "disable"
 
 secure:
