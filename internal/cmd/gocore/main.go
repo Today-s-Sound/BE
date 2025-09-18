@@ -14,6 +14,8 @@ import (
 	"github.com/labstack/echo/v4" // 웹 프레임워크 (Spring의 @RestController 같은)
 	"go.uber.org/fx"              // 의존성 주입 (Spring의 @Autowired 같은)
 
+	_ "github.com/go-sql-driver/mysql"
+
 	// 우리 프로젝트의 패키지들
 	"github.com/nicewook/gocore/internal/global/config"      // 설정 관리
 	"github.com/nicewook/gocore/internal/global/db"          // 데이터베이스 연결
@@ -93,7 +95,7 @@ func NewLogger(cfg *config.Config) *slog.Logger {
 }
 
 func NewDB(lc fx.Lifecycle, cfg *config.Config) *sql.DB {
-	// 데이터베이스 연결 생성
+
 	dbConn, err := db.NewDBConnection(cfg)
 	if err != nil {
 		log.Fatalf("DB connection error: %v", err)
@@ -117,7 +119,7 @@ func RegisterMiddlewares(cfg *config.Config, logger *slog.Logger, e *echo.Echo) 
 	middlewares.RegisterMiddlewares(cfg, logger, e)
 }
 
-func RegisterRoutes(e *echo.Echo) {
+func RegisterRoutes(e *echo.Echo, db *sql.DB) {
 	// 헬스체크 엔드포인트
 	e.GET("/health", func(c echo.Context) error {
 		return errors.OK(c, map[string]string{
